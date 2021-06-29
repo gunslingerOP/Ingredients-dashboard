@@ -22,24 +22,25 @@ import {
 } from "./api";
 import IngredientRow from "./components/tableRow";
 import MakeTable from "./components/table";
-import MuiAlert, { AlertProps } from "@material-ui/lab/Alert";
+import MuiAlert from "@material-ui/lab/Alert";
 
 export default function Home() {
-  function Alert(props: AlertProps) {
+  function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
   }
   const [errmsg, seterrmsg] = useState();
   const [errAlert, setErrAlert] = useState(false);
-  const [loadItems, setLoadItems] = useState(false);
+
   const [data, setData] = useState([]);
   const [addNew, setAddNew] = useState(false);
   const [file, setFile] = useState();
-  const [loading, setLoading] = useState(true);
+
   const [url, setUrl] = useState("");
   const [analyz, setanalyz] = useState(false);
   const [title, setTitle] = useState();
   const [analyzerr, setanalyzerr] = useState(false);
   const [snackbar, setSnackBar] = useState(false);
+  const [submit, setSubmit] = useState(false);
 
   const [car, setCar] = useState("-");
   const [fat, setFat] = useState("-");
@@ -61,19 +62,17 @@ export default function Home() {
       if (result.status !== "Success") {
         if (result.message) seterrmsg(result.message);
         setErrAlert(true);
-
-        setLoading(false);
       } else {
         setData(result.data.Items);
-        setLoadItems(true);
+
         console.log(result);
-        setLoading(false);
       }
     });
   }, []);
 
   const handleSubmit = () => {
     if (file) {
+      setSubmit(true);
       getUrl((err, result) => {
         if (err) throw err;
 
@@ -81,13 +80,34 @@ export default function Home() {
           if (result.message) seterrmsg(result.message);
           setErrAlert(true);
           console.log(result);
-          setLoading(false);
         } else {
           console.log(result.data);
           setUrl(result.data);
 
           //uploading image to s3 bucket
           uploadImg(result.data, file);
+
+          addIngredient(
+            { title, image: result.data.split("?")[0] },
+            (error, response) => {
+              if (error) throw error;
+              setSnackBar(true);
+              setAddNew(false);
+              setSubmit(false);
+              getAllItems((err, result) => {
+                if (err) throw err;
+
+                if (result.status !== "Success") {
+                  if (result.message) seterrmsg(result.message);
+                  setErrAlert(true);
+                } else {
+                  setData(result.data.Items);
+
+                  console.log(result);
+                }
+              });
+            }
+          );
         }
       });
     } else {
@@ -100,18 +120,6 @@ export default function Home() {
     if (url) {
       console.log("Image url", url);
       setUrl(url.split("?")[0]);
-
-      if (!title || !url) {
-        seterrmsg("Please provide a title and an image");
-        setanalyzerr(true);
-      } else {
-        addIngredient({ title, image: url }, (error, response) => {
-          if (error) throw error;
-          setSnackBar(true);
-          setAddNew(false);
-          window.location.reload();
-        });
-      }
     }
   }, [url]);
 
@@ -122,6 +130,8 @@ export default function Home() {
     setTitle();
     setCar("-");
     setFat("-");
+    setSubmit(false);
+
     setProt("-");
     setFile();
     setSnackBar(false);
@@ -173,10 +183,9 @@ export default function Home() {
             setProt(el.amount);
           }
         });
+        setanalyz(false);
       });
     });
-
-    setanalyz(false);
   };
 
   const handleAnalysisClose = () => {
@@ -233,7 +242,12 @@ export default function Home() {
             <Button onClick={handleClose} color="primary">
               Cancel
             </Button>
-            <Button variant="contained" onClick={handleSubmit} color="primary">
+            <Button
+              variant="contained"
+              disabled={submit}
+              onClick={handleSubmit}
+              color="primary"
+            >
               Add
             </Button>
             <Button

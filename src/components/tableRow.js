@@ -1,6 +1,5 @@
 import { Button } from "@material-ui/core";
 import {
-  addIngredient,
   deleteIngredient,
   editIngredient,
   getFood,
@@ -19,7 +18,7 @@ import { DialogActions } from "@material-ui/core";
 import { DialogContent } from "@material-ui/core";
 import { DialogContentText } from "@material-ui/core";
 import { DialogTitle } from "@material-ui/core";
-import { useHistory } from "react-router-dom";
+
 import TextField from "@material-ui/core/TextField";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import Snackbar from "@material-ui/core/Snackbar";
@@ -44,10 +43,11 @@ export default function IngredientRow(props) {
   const [car, setCar] = useState("-");
   const [fat, setFat] = useState("-");
   const [prot, setProt] = useState("-");
-  const [loading, setLoading] = useState(true);
+
   const [errmsg, seterrmsg] = useState();
-  const [errAlert, setErrAlert] = useState(false);
+
   const [deleteSnack, setDeleteSnack] = useState(false);
+  const wholeRow = useRef();
 
   const refreshPage = () => {
     window.location.reload();
@@ -55,7 +55,7 @@ export default function IngredientRow(props) {
 
   const handleClose = () => {
     setDeleteModal(false);
-    setErrAlert(false);
+
     setEdit(false);
     setanalyz(false);
     setTitle();
@@ -77,7 +77,7 @@ export default function IngredientRow(props) {
       if (err) throw err;
       console.log(res);
       setDeleteSnack(true);
-      refreshPage();
+      wholeRow.current.style.display = "none";
     });
   };
 
@@ -97,7 +97,7 @@ export default function IngredientRow(props) {
 
         if (result.status !== "Success") {
           if (result.message) seterrmsg(result.message);
-          setErrAlert(true);
+
           console.log(result);
         } else {
           console.log(result.data);
@@ -316,6 +316,7 @@ export default function IngredientRow(props) {
       ) : null}
 
       <tr
+        ref={wholeRow}
         data-row="0"
         className="datatable-row datatable-row-even"
         style={{ left: "0px" }}
