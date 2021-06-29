@@ -151,9 +151,8 @@ export default function IngredientRow(props) {
           }
         });
       });
+      setanalyz(false);
     });
-
-    setanalyz(false);
   };
 
   const handleAnalysisClose = () => {
