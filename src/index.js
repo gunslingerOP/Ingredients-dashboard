@@ -18,6 +18,9 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import "./_assets/plugins/flaticon/flaticon.css";
 import "./_assets/plugins/flaticon2/flaticon.css";
 import Home from "./home";
+
+require("dotenv").config();
+
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>

@@ -63,6 +63,7 @@ export default function LoginUser() {
         localStorage.setItem("id_token", data.idToken.jwtToken);
         localStorage.setItem("user_token", data.accessToken.jwtToken);
         localStorage.setItem("username", data.accessToken.payload.username);
+        router.push("/home");
       },
       onFailure: (err) => {
         seterrmsg(err.message);
@@ -158,7 +159,7 @@ export default function LoginUser() {
               <div
                 className="aside-img d-flex flex-row-fluid bgi-no-repeat bgi-position-y-bottom bgi-position-x-center"
                 style={{
-                  backgroundimg:
+                  backgroundImage:
                     "url(https://preview.keenthemes.com/metronic/theme/html/demo1/dist/assets/media/svg/illustrations/login-visual-1.svg",
                 }}
               ></div>
